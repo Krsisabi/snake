@@ -59,6 +59,7 @@ const moveLeft = ([t, l]) => [t, l - 1];
 const moveUp = ([t, l]) => [t - 1, l];
 const moveDown = ([t, l]) => [t + 1, l];
 let currentDirection = moveRight;
+let flushedDirection = currentDirection;
 
 const keyCodes = {
   'KeyW': moveUp,
@@ -73,22 +74,34 @@ const keyCodes = {
 
 window.addEventListener('keydown', (e) => {
   const direction = keyCodes[e.code]
-  if (direction && currentDirection !== getOppositeDirection(direction)) {
+  // debugger
+  if (direction && flushedDirection !== getOppositeDirection(direction)) {
+    const directions = {
+      flushedDirection: flushedDirection.name,
+      direction: direction.name,
+      getOppositeDirection: getOppositeDirection(direction)
+    }
+    console.table(directions);
     currentDirection = direction;
   }
+  // if (direction && flushedDirection !== getOppositeDirection(direction)) {
+  //   console.log('flushedDirection !== getOppositeDirection(direction): ', flushedDirection !== getOppositeDirection(direction));
+  //   currentDirection = direction;
+  // }
 });
 
 function step() {
   currentSnake.shift();
   const head = currentSnake.at(-1);
   const nextHead = currentDirection(head);
+  flushedDirection = currentDirection;
   currentSnake.push(nextHead);
   drawSnake(currentSnake);
 }
 
 setInterval(() => {
   step()
-}, 100);
+}, 2000);
 
 function getOppositeDirection(direction) {
   switch (direction) {
