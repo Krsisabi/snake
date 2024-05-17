@@ -84,10 +84,6 @@ window.addEventListener('keydown', (e) => {
     console.table(directions);
     currentDirection = direction;
   }
-  // if (direction && flushedDirection !== getOppositeDirection(direction)) {
-  //   console.log('flushedDirection !== getOppositeDirection(direction): ', flushedDirection !== getOppositeDirection(direction));
-  //   currentDirection = direction;
-  // }
 });
 
 function step() {
@@ -101,7 +97,7 @@ function step() {
 
 setInterval(() => {
   step()
-}, 2000);
+}, 100);
 
 function getOppositeDirection(direction) {
   switch (direction) {
