@@ -100,8 +100,8 @@ function getOppositeDirection(direction) {
       return moveUp;
     case moveLeft:
       return moveRight;
-    case moveRight:
-      return moveLeft;
+    case moveUp:
+      return moveDown;
     default:
       console.error('no such direction');
       return null;
