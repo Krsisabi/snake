@@ -74,14 +74,7 @@ const keyCodes = {
 
 window.addEventListener('keydown', (e) => {
   const direction = keyCodes[e.code]
-  // debugger
   if (direction && flushedDirection !== getOppositeDirection(direction)) {
-    const directions = {
-      flushedDirection: flushedDirection.name,
-      direction: direction.name,
-      getOppositeDirection: getOppositeDirection(direction)
-    }
-    console.table(directions);
     currentDirection = direction;
   }
 });
@@ -102,19 +95,15 @@ setInterval(() => {
 function getOppositeDirection(direction) {
   switch (direction) {
     case moveRight:
-      return moveLeft;
-      break;
+      return moveLeft;;
     case moveDown:
       return moveUp;
-      break;
     case moveLeft:
       return moveRight;
-      break;
     case moveRight:
       return moveLeft;
-      break;
     default:
+      console.error('no such direction');
       return null;
-      break;
   }
 }
