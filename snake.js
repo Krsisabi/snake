@@ -59,7 +59,6 @@ const moveLeft = ([t, l]) => [t, l - 1];
 const moveUp = ([t, l]) => [t - 1, l];
 const moveDown = ([t, l]) => [t + 1, l];
 let currentDirection = moveRight;
-let flushedDirection = currentDirection;
 
 const keyCodes = {
   'KeyW': moveUp,
@@ -72,19 +71,27 @@ const keyCodes = {
   'ArrowDown': moveDown
 };
 
+const directionQueue = [];
+
 window.addEventListener('keydown', (e) => {
   const direction = keyCodes[e.code]
-  if (direction && flushedDirection !== getOppositeDirection(direction)) {
-    currentDirection = direction;
-  }
+  if (direction && directionQueue.length <= 3) directionQueue.push(direction);
 });
 
 function step() {
   currentSnake.shift();
   const head = currentSnake.at(-1);
+
+  while (directionQueue.length > 0) {
+    const candidateDirection = directionQueue.shift();
+    if (!areOpposite(currentDirection, candidateDirection)) currentDirection = candidateDirection
+    break;
+  }
+
   const nextHead = currentDirection(head);
   flushedDirection = currentDirection;
   currentSnake.push(nextHead);
+  bump(directionQueue)
   drawSnake(currentSnake);
 }
 
@@ -106,4 +113,17 @@ function getOppositeDirection(direction) {
       console.error('no such direction');
       return null;
   }
+}
+
+const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection)
+
+function bump(directionQueue) {
+  let debug = document.getElementById('debug');
+  if (!debug) {
+    debug = document.createElement('div');
+    debug.id = 'debug';
+    debug.style.cssText = 'color: red; font-size: 30px;';
+    document.body.appendChild(debug);
+  }
+  debug.textContent = directionQueue.reduce((acc, { name }) => acc + name + ', ', '');
 }
