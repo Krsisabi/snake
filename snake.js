@@ -33,16 +33,11 @@ const currentSnake = [
   [0, 4]
 ]
 
-drawSnake(currentSnake)
+let snakePositions = getPositionsSet(currentSnake)
 
+drawSnake()
 
-function drawSnake(snake) {
-  const snakePositions = new Set();
-  for (let [top, left] of snake) {
-    const position = top + '_' + left;
-    snakePositions.add(position);
-  }
-
+function drawSnake() {
   for (let i = 0; i < ROWS; i++) {
     for (let j = 0; j < COLS; j++) {
       const position = i + '_' + j;
@@ -89,14 +84,30 @@ function step() {
   }
 
   const nextHead = currentDirection(head);
-  flushedDirection = currentDirection;
+
+  if (!isValid(snakePositions, nextHead)) {
+    canvas.style.border = '5px solid red';
+    stopGame();
+    return;
+  }
+
   currentSnake.push(nextHead);
+  snakePositions = getPositionsSet(currentSnake);
   drawSnake(currentSnake);
 }
 
-setInterval(() => {
+const stepIntervalId = setInterval(() => {
   step()
 }, 100);
+
+function getPositionsSet(snake) {
+  const set = new Set();
+  for (let [top, left] of snake) {
+    const position = top + '_' + left;
+    set.add(position);
+  }
+  return set
+}
 
 function getOppositeDirection(direction) {
   switch (direction) {
@@ -115,6 +126,17 @@ function getOppositeDirection(direction) {
 }
 
 const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection)
+
+function isValid(snakePositions, [t, l]) {
+  if (t < 0 || l < 0) return false
+  if (t >= ROWS || l >= COLS) return false
+  if (snakePositions.has(t + '_' + l)) return false
+  return true
+}
+
+const stopGame = () => {
+  clearInterval(stepIntervalId);
+}
 
 function bump(obj) {
   let debug = document.getElementById('debug');
