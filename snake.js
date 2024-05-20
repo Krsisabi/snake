@@ -86,7 +86,6 @@ function step() {
   const nextHead = currentDirection(head);
 
   if (!isValid(snakePositions, nextHead)) {
-    canvas.style.border = '5px solid red';
     stopGame();
     return;
   }
@@ -127,14 +126,10 @@ function getOppositeDirection(direction) {
 
 const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection)
 
-function isValid(snakePositions, [t, l]) {
-  if (t < 0 || l < 0) return false
-  if (t >= ROWS || l >= COLS) return false
-  if (snakePositions.has(t + '_' + l)) return false
-  return true
-}
+const isValid = (snakePositions, [t, l]) => !(t < 0 || l < 0 || t >= ROWS || l >= COLS || snakePositions.has(`${t}_${l}`))
 
 const stopGame = () => {
+  canvas.style.border = '5px solid red';
   clearInterval(stepIntervalId);
 }
 
