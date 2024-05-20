@@ -91,7 +91,6 @@ function step() {
   const nextHead = currentDirection(head);
   flushedDirection = currentDirection;
   currentSnake.push(nextHead);
-  bump(directionQueue)
   drawSnake(currentSnake);
 }
 
@@ -117,7 +116,7 @@ function getOppositeDirection(direction) {
 
 const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection)
 
-function bump(directionQueue) {
+function bump(obj) {
   let debug = document.getElementById('debug');
   if (!debug) {
     debug = document.createElement('div');
@@ -125,5 +124,17 @@ function bump(directionQueue) {
     debug.style.cssText = 'color: red; font-size: 30px;';
     document.body.appendChild(debug);
   }
-  debug.textContent = directionQueue.reduce((acc, { name }) => acc + name + ', ', '');
+
+  switch (true) {
+    case obj === null:
+    case obj === undefined:
+      debug.textContent = 'Object is null or undefined';
+      break;
+    case Array.isArray(obj) && obj.every(item => typeof item === 'function'):
+      debug.textContent = obj.reduce((acc, { name }) => acc + name + ', ', '');
+      break;
+    default:
+      debug.textContent = JSON.stringify(obj);
+      break;
+  }
 }
