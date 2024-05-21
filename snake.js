@@ -141,8 +141,15 @@ const stopGame = () => {
 }
 
 function getFoodPosition() {
-  const randomize = (quantity) => Math.floor(Math.random() * quantity);
-  return [randomize(ROWS), randomize(COLS)];
+  const pixelsKeys = new Set(pixels.keys());
+  for (const key of pixelsKeys) {
+    if (currentSnakePosKeys.has(key)) pixelsKeys.delete(key);
+  }
+
+  const vacantKeys = Array.from(pixelsKeys);
+  const randomId = Math.round(Math.random() * vacantKeys.length);
+
+  return vacantKeys[randomId].split('_');
 }
 
 function toKey([t, l]) {
