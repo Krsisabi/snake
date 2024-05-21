@@ -16,14 +16,14 @@ function initializeCanvas() {
       pixel.style.top = i * PIXEL + 'px';
       pixel.style.width = PIXEL + 'px';
       pixel.style.height = PIXEL + 'px';
-      const position = i + '_' + j;
+      const posKey = toKey([i, j]);
       canvas.appendChild(pixel);
-      pixels.set(position, pixel);
+      pixels.set(posKey, pixel);
     }
   }
 }
 
-initializeCanvas()
+initializeCanvas();
 
 const currentSnake = [
   [0, 0],
@@ -33,16 +33,16 @@ const currentSnake = [
   [0, 4]
 ]
 
-let snakePositions = getPositionsSet(currentSnake)
+let snakePositions = getPositionsSet(currentSnake);
 
-drawSnake()
+drawSnake();
 
 function drawSnake() {
   for (let i = 0; i < ROWS; i++) {
     for (let j = 0; j < COLS; j++) {
-      const position = i + '_' + j;
-      const pixel = pixels.get(position);
-      pixel.style.background = snakePositions.has(position) ?
+      const key = toKey([i, j]);
+      const pixel = pixels.get(key);
+      pixel.style.background = snakePositions.has(key) ?
         'black' :
         'white';
     }
@@ -69,7 +69,7 @@ const keyCodes = {
 const directionQueue = [];
 
 window.addEventListener('keydown', (e) => {
-  const direction = keyCodes[e.code]
+  const direction = keyCodes[e.code];
   if (direction && directionQueue.length <= 3) directionQueue.push(direction);
 });
 
@@ -79,13 +79,13 @@ function step() {
 
   while (directionQueue.length > 0) {
     const candidateDirection = directionQueue.shift();
-    if (!areOpposite(currentDirection, candidateDirection)) currentDirection = candidateDirection
+    if (!areOpposite(currentDirection, candidateDirection)) currentDirection = candidateDirection;
     break;
   }
 
   const nextHead = currentDirection(head);
 
-  if (!isValid(snakePositions, nextHead)) {
+  if (!isValidHead(snakePositions, nextHead)) {
     stopGame();
     return;
   }
@@ -96,22 +96,22 @@ function step() {
 }
 
 const stepIntervalId = setInterval(() => {
-  step()
+  step();
 }, 100);
 
 function getPositionsSet(snake) {
   const set = new Set();
-  for (let [top, left] of snake) {
-    const position = top + '_' + left;
-    set.add(position);
+  for (let cell of snake) {
+    const key = toKey(cell);
+    set.add(key);
   }
-  return set
+  return set;
 }
 
 function getOppositeDirection(direction) {
   switch (direction) {
     case moveRight:
-      return moveLeft;;
+      return moveLeft;
     case moveDown:
       return moveUp;
     case moveLeft:
@@ -124,13 +124,17 @@ function getOppositeDirection(direction) {
   }
 }
 
-const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection)
+const areOpposite = (currentDirection, nextDirection) => currentDirection === getOppositeDirection(nextDirection);
 
-const isValid = (snakePositions, [t, l]) => !(t < 0 || l < 0 || t >= ROWS || l >= COLS || snakePositions.has(`${t}_${l}`))
+const isValidHead = (snakePositions, [t, l]) => !(t < 0 || l < 0 || t >= ROWS || l >= COLS || snakePositions.has(toKey([t, l])));
 
 const stopGame = () => {
   canvas.style.border = '5px solid red';
   clearInterval(stepIntervalId);
+}
+
+function toKey([t, l]) {
+  return t + '_' + l;
 }
 
 function bump(obj) {
