@@ -65,23 +65,24 @@ const keyCodes = {
 };
 
 window.addEventListener('keydown', (e) => {
-  if (e.code === 'KeyR') {
-    stopGame();
-    startGame();
+  switch (e.code) {
+    case 'KeyR':
+      stopGame();
+      startGame();
+      break;
+    case 'KeyP':
+      if (isGamePaused) {
+        continueGame()
+      } else {
+        pauseGame();
+      }
+      break;
+    default:
+      if (isGamePaused) return;
+      const direction = keyCodes[e.code];
+      if (direction && directionQueue.length <= 3) directionQueue.push(direction);
+      break;
   }
-
-  if (e.code === 'KeyP') {
-    if (isGamePaused) {
-      continueGame()
-    } else {
-      pauseGame();
-    }
-  }
-
-  if (isGamePaused) return;
-
-  const direction = keyCodes[e.code];
-  if (direction && directionQueue.length <= 3) directionQueue.push(direction);
 });
 
 function step() {
