@@ -4,6 +4,14 @@ const ROWS = 30;
 const COLS = 50;
 const PIXEL = 10;
 
+let currentSnake;
+let currentSnakePosKeys;
+let food;
+let currentDirection;
+let directionQueue;
+let isGamePaused;
+let gameSpeed = 100;
+
 const pixels = new Map();
 
 function initializeCanvas() {
@@ -25,18 +33,6 @@ function initializeCanvas() {
 
 initializeCanvas();
 
-const currentSnake = [
-  [0, 0],
-  [0, 1],
-  [0, 2],
-  [0, 3],
-  [0, 4]
-]
-let currentSnakePosKeys = getPositionsSet(currentSnake);
-let food = getFoodPosition();
-
-draw();
-
 function draw() {
   for (let i = 0; i < ROWS; i++) {
     for (let j = 0; j < COLS; j++) {
@@ -56,7 +52,6 @@ const moveRight = ([t, l]) => [t, l + 1];
 const moveLeft = ([t, l]) => [t, l - 1];
 const moveUp = ([t, l]) => [t - 1, l];
 const moveDown = ([t, l]) => [t + 1, l];
-let currentDirection = moveRight;
 
 const keyCodes = {
   'KeyW': moveUp,
@@ -69,9 +64,22 @@ const keyCodes = {
   'ArrowDown': moveDown
 };
 
-const directionQueue = [];
-
 window.addEventListener('keydown', (e) => {
+  if (e.code === 'KeyR') {
+    stopGame();
+    startGame();
+  }
+
+  if (e.code === 'KeyP') {
+    if (isGamePaused) {
+      continueGame()
+    } else {
+      pauseGame();
+    }
+  }
+
+  if (isGamePaused) return;
+
   const direction = keyCodes[e.code];
   if (direction && directionQueue.length <= 3) directionQueue.push(direction);
 });
@@ -102,9 +110,7 @@ function step() {
   draw(currentSnake);
 }
 
-const stepIntervalId = setInterval(() => {
-  step();
-}, 100);
+startGame();
 
 function getPositionsSet(snake) {
   const set = new Set();
@@ -138,6 +144,38 @@ const isValidHead = (snakePositions, [t, l]) => !(t < 0 || l < 0 || t >= ROWS ||
 const stopGame = () => {
   canvas.style.border = '5px solid red';
   clearInterval(stepIntervalId);
+}
+
+function startGame() {
+  canvas.style.border = '';
+  currentSnake = getInitSnake();
+  currentSnakePosKeys = getPositionsSet(currentSnake);
+  food = getFoodPosition();
+  directionQueue = [];
+  currentDirection = moveRight;
+  continueGame();
+}
+
+function pauseGame() {
+  isGamePaused = true;
+  clearInterval(stepIntervalId);
+}
+
+function continueGame() {
+  isGamePaused = false
+  stepIntervalId = setInterval(() => {
+    step();
+  }, gameSpeed);
+}
+
+function getInitSnake() {
+  return [
+    [0, 0],
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [0, 4]
+  ];
 }
 
 function getFoodPosition() {
