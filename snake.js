@@ -71,11 +71,7 @@ window.addEventListener('keydown', (e) => {
       startGame();
       break;
     case 'KeyP':
-      if (isGamePaused) {
-        continueGame()
-      } else {
-        pauseGame();
-      }
+      togglePause();
       break;
     default:
       if (isGamePaused) return;
@@ -157,13 +153,16 @@ function startGame() {
   continueGame();
 }
 
-function pauseGame() {
-  isGamePaused = true;
-  clearInterval(stepIntervalId);
+function togglePause() {
+  isGamePaused = !isGamePaused;
+  if (isGamePaused) {
+    clearInterval(stepIntervalId);
+  } else {
+    continueGame()
+  }
 }
 
 function continueGame() {
-  isGamePaused = false
   stepIntervalId = setInterval(() => {
     step();
   }, gameSpeed);
