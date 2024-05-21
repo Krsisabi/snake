@@ -32,19 +32,22 @@ const currentSnake = [
   [0, 3],
   [0, 4]
 ]
+let currentSnakePosKeys = getPositionsSet(currentSnake);
+let food = getFoodPosition();
 
-let snakePositions = getPositionsSet(currentSnake);
+draw();
 
-drawSnake();
-
-function drawSnake() {
+function draw() {
   for (let i = 0; i < ROWS; i++) {
     for (let j = 0; j < COLS; j++) {
       const key = toKey([i, j]);
       const pixel = pixels.get(key);
-      pixel.style.background = snakePositions.has(key) ?
+
+      pixel.style.background = currentSnakePosKeys.has(key) ?
         'black' :
         'white';
+
+      if (toKey(food) === key) pixel.style.background = 'purple'
     }
   }
 }
@@ -74,25 +77,29 @@ window.addEventListener('keydown', (e) => {
 });
 
 function step() {
-  currentSnake.shift();
-  const head = currentSnake.at(-1);
-
   while (directionQueue.length > 0) {
     const candidateDirection = directionQueue.shift();
     if (!areOpposite(currentDirection, candidateDirection)) currentDirection = candidateDirection;
     break;
   }
 
+  const head = currentSnake.at(-1);
   const nextHead = currentDirection(head);
 
-  if (!isValidHead(snakePositions, nextHead)) {
+  if (!isValidHead(currentSnakePosKeys, nextHead)) {
     stopGame();
     return;
   }
 
+  if (!(toKey(nextHead) === toKey(food))) {
+    currentSnake.shift();
+  } else {
+    food = getFoodPosition();
+  }
+
   currentSnake.push(nextHead);
-  snakePositions = getPositionsSet(currentSnake);
-  drawSnake(currentSnake);
+  currentSnakePosKeys = getPositionsSet(currentSnake);
+  draw(currentSnake);
 }
 
 const stepIntervalId = setInterval(() => {
@@ -131,6 +138,11 @@ const isValidHead = (snakePositions, [t, l]) => !(t < 0 || l < 0 || t >= ROWS ||
 const stopGame = () => {
   canvas.style.border = '5px solid red';
   clearInterval(stepIntervalId);
+}
+
+function getFoodPosition() {
+  const randomize = (quantity) => Math.floor(Math.random() * quantity);
+  return [randomize(ROWS), randomize(COLS)];
 }
 
 function toKey([t, l]) {
